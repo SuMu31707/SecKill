@@ -21,7 +21,7 @@ public class RespBean {
      * @return
      */
     public static RespBean success() {
-        return new RespBean(RespBeanEnum.SUCCESS.getCode(), RespBean.success().getMessage(), null);
+        return new RespBean(RespBeanEnum.SUCCESS.getCode(), RespBeanEnum.SUCCESS.getMessage(), null);
     }
 
     /**
@@ -37,7 +37,7 @@ public class RespBean {
      * @param respBeanEnum
      * @return
      */
-    public RespBean error(RespBeanEnum respBeanEnum) {
+    public static RespBean error(RespBeanEnum respBeanEnum) {
         return new RespBean(respBeanEnum.getCode(), respBeanEnum.getMessage(), null);
     }
 
@@ -46,7 +46,7 @@ public class RespBean {
      * @param respBeanEnum
      * @return
      */
-    public RespBean error(RespBeanEnum respBeanEnum, Object obj) {
+    public static RespBean error(RespBeanEnum respBeanEnum, Object obj) {
         return new RespBean(respBeanEnum.getCode(), respBeanEnum.getMessage(), obj);
     }
 
