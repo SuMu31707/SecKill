@@ -1,6 +1,5 @@
 package com.sumu.seckill.exception;
 
-import com.baomidou.mybatisplus.extension.api.R;
 import com.sumu.seckill.vo.RespBean;
 import com.sumu.seckill.vo.RespBeanEnum;
 import org.springframework.validation.BindException;
@@ -24,6 +23,7 @@ public class GlobalExceptionHandler {
             respBean.setMessage("参数校验异常："+ ex.getBindingResult().getAllErrors().get(0).getDefaultMessage());
             return respBean;
         }
+        System.out.println("发生异常："+e.getMessage());
         return RespBean.error(RespBeanEnum.ERROR);
     }
 }

@@ -24,6 +24,8 @@
             <td>商品原价</td>
             <td>秒杀价</td>
             <td>库存数量</td>
+            <td>开始时间</td>
+            <td>结束时间</td>
             <td>详情</td>
         </tr>
         <tr th:each="goods,goodsStat : ${goodsList}">
@@ -32,7 +34,10 @@
             <td th:text="${goods.goodsPrice}"></td>
             <td th:text="${goods.seckillPrice}"></td>
             <td th:text="${goods.stockCount}"></td>
-            <td><a th:href="'/goodsDetail.htm?goodsId='+${goods.id}">详情</a></td>
+            <td th:text="${#dates.format(goods.startDate, 'yyyy-MM-dd HH:mm:ss')}"></td>
+            <td th:text="${#dates.format(goods.endDate, 'yyyy-MM-dd HH:mm:ss')}"></td>
+            <td><a th:href="'/goods/toDetail/'+${goods.id}">详情</a></td>
+<!--            <td><a th:href="'/goodsDetail.htm?goodsId='+${goods.id}">详情</a></td>-->
         </tr>
     </table>
 </div>

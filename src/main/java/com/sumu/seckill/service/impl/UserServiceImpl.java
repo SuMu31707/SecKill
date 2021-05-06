@@ -46,13 +46,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     public RespBean doLogin(LoginVo loginVo, HttpServletRequest request, HttpServletResponse response) {
         String mobile = loginVo.getMobile();
         String password = loginVo.getPassword();
-        /*// 参数校验
-        if (StringUtils.isEmpty(mobile) || StringUtils.isEmpty(password)){
-            return RespBean.error(RespBeanEnum.LOGIN_ERROR);
-        }
-        if (!ValidatorUtil.isMobile(mobile)){
-            return RespBean.error(RespBeanEnum.MOBILE_ERROR);
-        }*/
         // 根据id（手机号码）查询用户
         User user = userMapper.selectById(mobile);
         if (user == null) {

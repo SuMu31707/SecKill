@@ -47,8 +47,6 @@ spring:
         # 最小连接数，默认0
         min-idle: 5
 
-
-
 # mybatis-plus配置
 mybatis-plus:
   # 配置Mapper.xml映射文件
