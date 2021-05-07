@@ -17,6 +17,6 @@ public class MQSender {
 
     public void send(Object msg) {
         log.info("发送信息：" + msg);
-        rabbitTemplate.convertAndSend("queue",msg);
+        rabbitTemplate.convertAndSend("fanoutExchange", "", msg);
     }
 }

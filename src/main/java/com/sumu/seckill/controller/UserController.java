@@ -44,4 +44,13 @@ public class UserController {
     public void mq() {
         mqSender.send("helle mq");
     }
+
+    /**
+     * fanout模式
+     */
+    @RequestMapping("/mq/fanout")
+    @ResponseBody
+    public void fanout() {
+        mqSender.send("hello mq fanout!");
+    }
 }
