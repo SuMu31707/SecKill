@@ -3,7 +3,9 @@ package com.sumu.seckill.controller;
 import com.sumu.seckill.pojo.User;
 import com.sumu.seckill.service.IGoodsService;
 import com.sumu.seckill.service.IUserService;
+import com.sumu.seckill.vo.DetailVo;
 import com.sumu.seckill.vo.GoodsVo;
+import com.sumu.seckill.vo.RespBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
@@ -44,11 +46,11 @@ public class GoodsController {
      * 跳转商品列表页
      * <p>
      * 优化前：
-     * Win QPS：2306.7
-     * Linux QPS：655.3
-     * 优化后：
-     * Win QPS：
-     * Linux QPS：
+     *      Win QPS：2306.7
+     *      Linux QPS：655.3
+     * 页面缓存优化后：
+     *      Win QPS：3285.1
+     *      Linux QPS：1974.3
      *
      * @param model
      * @return
@@ -81,9 +83,9 @@ public class GoodsController {
      * @param model
      * @return
      */
-    @RequestMapping(value = "/toDetail/{goodsId}", produces = "text/html;charset=utf-8")
+    @RequestMapping(value = "/toDetail2/{goodsId}", produces = "text/html;charset=utf-8")
     @ResponseBody
-    public String toDetail(Model model, User user, @PathVariable Long goodsId, HttpServletRequest request, HttpServletResponse response) {
+    public String toDetail2(Model model, User user, @PathVariable Long goodsId, HttpServletRequest request, HttpServletResponse response) {
         ValueOperations valueOperations = redisTemplate.opsForValue();
         // Redis中获取页面，不为空直接返回页面
         String html = (String) valueOperations.get("goodsDetail:" + goodsId);
@@ -121,5 +123,41 @@ public class GoodsController {
         }
         return html;
         //        return "goodsDetail";
+    }
+
+    /**
+     * 跳转商品详情页
+     *
+     * @param model
+     * @return
+     */
+    @RequestMapping("/detail/{goodsId}")
+    @ResponseBody
+    public RespBean toDetail(User user, @PathVariable Long goodsId) {
+        GoodsVo goods = goodsService.getGoodsVoByGoodsId(goodsId);
+        Date startDate = goods.getStartDate();
+        Date endDate = goods.getEndDate();
+        Date nowDate = new Date();
+        // 秒杀状态
+        int seckillStatus = 0;
+        // 秒杀倒计时
+        int remainSeconds = 0;
+        // 当前时间在开始秒杀时间之前，秒杀还未开始
+        if (nowDate.before(startDate)) {
+            remainSeconds = (int) ((startDate.getTime() - nowDate.getTime()) / 1000);
+        } else if (nowDate.after(endDate)) {
+            // 秒杀已结束
+            seckillStatus = 2;
+            remainSeconds = -1;
+        } else {
+            seckillStatus = 1;
+            remainSeconds = 0;
+        }
+        DetailVo detailVo = new DetailVo();
+        detailVo.setUser(user);
+        detailVo.setGoodsVo(goods);
+        detailVo.setSeckillStatus(seckillStatus);
+        detailVo.setRemainSeconds(remainSeconds);
+        return RespBean.success(detailVo);
     }
 }

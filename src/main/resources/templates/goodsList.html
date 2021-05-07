@@ -36,8 +36,8 @@
             <td th:text="${goods.stockCount}"></td>
             <td th:text="${#dates.format(goods.startDate, 'yyyy-MM-dd HH:mm:ss')}"></td>
             <td th:text="${#dates.format(goods.endDate, 'yyyy-MM-dd HH:mm:ss')}"></td>
-            <td><a th:href="'/goods/toDetail/'+${goods.id}">详情</a></td>
-<!--            <td><a th:href="'/goodsDetail.htm?goodsId='+${goods.id}">详情</a></td>-->
+<!--            <td><a th:href="'/goods/toDetail/'+${goods.id}">详情</a></td>-->
+            <td><a th:href="'/goodsDetail.htm?goodsId='+${goods.id}">详情</a></td>
         </tr>
     </table>
 </div>
