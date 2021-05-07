@@ -7,11 +7,14 @@ import com.sumu.seckill.pojo.User;
 import com.sumu.seckill.service.IGoodsService;
 import com.sumu.seckill.service.ISeckillOrderService;
 import com.sumu.seckill.vo.GoodsVo;
+import com.sumu.seckill.vo.RespBean;
 import com.sumu.seckill.vo.RespBeanEnum;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 /**
  * 商品秒杀
@@ -28,18 +31,54 @@ public class SecKillController {
     /**
      * 秒杀
      * 优化前：
-     *   Win QPS：2285.6
-     *   Linux QPS：644.3
+     * Win QPS：2285.6
+     * Linux QPS：644.3
      * 优化后：
-     *   Win QPS：
-     *   Linux QPS：
+     * Win QPS：
+     * Linux QPS：
+     *
      * @param model
      * @param user
      * @param goodsId
      * @return
      */
-    @RequestMapping("/doSeckill")
-    public String doSeckill(Model model, User user, Long goodsId) {
+    @PostMapping("/doSeckill")
+    @ResponseBody
+    public RespBean doSeckill(User user, Long goodsId) {
+        if (user == null) {
+            return RespBean.error(RespBeanEnum.SESSION_ERROR);
+        }
+        GoodsVo goods = goodsService.getGoodsVoByGoodsId(goodsId);
+        // 判断库存
+        if (goods.getStockCount() < 1) {
+            return RespBean.error(RespBeanEnum.EMPTY_STOCK);
+        }
+        // 判断订单（查询用户是否有重复抢购行为）
+        SeckillOrder seckillOrder = seckillOrderService.getOne(new QueryWrapper<SeckillOrder>().eq("user_id", user.getId()).eq("goods_id", goodsId));
+        if (seckillOrder != null) {
+            return RespBean.error(RespBeanEnum.REPEATE_ERROR);
+        }
+        Order order = seckillOrderService.seckill(user, goods);
+        System.out.println("订单ID：" + order.getId());
+        return RespBean.success(order);
+    }
+
+    /**
+     * 秒杀
+     * 优化前：
+     * Win QPS：2285.6
+     * Linux QPS：644.3
+     * 优化后：
+     * Win QPS：
+     * Linux QPS：
+     *
+     * @param model
+     * @param user
+     * @param goodsId
+     * @return
+     */
+    @RequestMapping("/doSeckill2")
+    public String doSeckill2(Model model, User user, Long goodsId) {
         if (user == null) {
             return "login";
         }
@@ -58,7 +97,7 @@ public class SecKillController {
         }
         Order order = seckillOrderService.seckill(user, goods);
         model.addAttribute("order", order);
-        model.addAttribute("goods",goods);
+        model.addAttribute("goods", goods);
         return "orderDetail";
     }
 }

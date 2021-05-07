@@ -87,16 +87,20 @@
         var captcha = $("#captcha").val();
         g_showLoading();
         $.ajax({
-            url: "/seckill/path",
-            type: "GET",
+            // url: "/seckill/path",
+            url: "/seckill/doSeckill",
+            type: "POST",
             data: {
-                goodsId: goodsId,
-                captcha: captcha
+                goodsId:$("#goodsId").val()
+                // goodsId: goodsId,
+                // captcha: captcha
             },
             success: function (data) {
                 if (data.code == 200) {
-                    var path = data.obj;
-                    doSeckill(path);
+                    alert(data.obj)
+                    // var path = data.obj;
+                    // doSeckill(path);
+                    window.location.href="/orderDetail.htm?orderId=" + data.obj.id;
                 } else {
                     layer.msg(data.message);
                 }
