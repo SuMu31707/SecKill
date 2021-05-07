@@ -21,12 +21,7 @@ public class UserController {
 
     /**
      * 用户信息（测试）
-     * 优化前：
-     *      Win：1152.1 QBS
-     *      Linux：906.3 QBS
-     * 优化后：
-     *      Win：
-     *      Linux：
+     *
      * @param user
      * @return
      */

@@ -7,7 +7,6 @@ import com.sumu.seckill.pojo.User;
 import com.sumu.seckill.service.IGoodsService;
 import com.sumu.seckill.service.ISeckillOrderService;
 import com.sumu.seckill.vo.GoodsVo;
-import com.sumu.seckill.vo.RespBean;
 import com.sumu.seckill.vo.RespBeanEnum;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -26,6 +25,19 @@ public class SecKillController {
     @Autowired
     private ISeckillOrderService seckillOrderService;
 
+    /**
+     * 秒杀
+     * 优化前：
+     *   Win QPS：2285.6
+     *   Linux QPS：644.3
+     * 优化后：
+     *   Win QPS：
+     *   Linux QPS：
+     * @param model
+     * @param user
+     * @param goodsId
+     * @return
+     */
     @RequestMapping("/doSeckill")
     public String doSeckill(Model model, User user, Long goodsId) {
         if (user == null) {
