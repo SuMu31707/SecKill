@@ -2,7 +2,9 @@ package com.sumu.seckill.controller;
 
 
 import com.sumu.seckill.pojo.User;
+import com.sumu.seckill.rabbitmq.MQSender;
 import com.sumu.seckill.vo.RespBean;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -19,6 +21,9 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/user")
 public class UserController {
 
+    @Autowired
+    private MQSender mqSender;
+
     /**
      * 用户信息（测试）
      *
@@ -31,4 +36,12 @@ public class UserController {
         return RespBean.success(user);
     }
 
+    /**
+     * 测试发送MQ消息
+     */
+    @RequestMapping("/mq")
+    @ResponseBody
+    public void mq() {
+        mqSender.send("helle mq");
+    }
 }
