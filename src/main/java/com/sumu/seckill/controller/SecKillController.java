@@ -10,6 +10,7 @@ import com.sumu.seckill.vo.GoodsVo;
 import com.sumu.seckill.vo.RespBean;
 import com.sumu.seckill.vo.RespBeanEnum;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -27,6 +28,8 @@ public class SecKillController {
     private IGoodsService goodsService;
     @Autowired
     private ISeckillOrderService seckillOrderService;
+    @Autowired
+    private RedisTemplate redisTemplate;
 
     /**
      * 秒杀
@@ -34,10 +37,9 @@ public class SecKillController {
      * Win QPS：2285.6
      * Linux QPS：644.3
      * 优化后：
-     * Win QPS：
+     * Win QPS：2294.4
      * Linux QPS：
      *
-     * @param model
      * @param user
      * @param goodsId
      * @return
@@ -54,12 +56,13 @@ public class SecKillController {
             return RespBean.error(RespBeanEnum.EMPTY_STOCK);
         }
         // 判断订单（查询用户是否有重复抢购行为）
-        SeckillOrder seckillOrder = seckillOrderService.getOne(new QueryWrapper<SeckillOrder>().eq("user_id", user.getId()).eq("goods_id", goodsId));
+//        SeckillOrder seckillOrder = seckillOrderService.getOne(new QueryWrapper<SeckillOrder>().eq("user_id", user.getId()).eq("goods_id", goodsId));
+        SeckillOrder  seckillOrder = (SeckillOrder) redisTemplate.opsForValue().get("order:" + user.getId() + ":" + goodsId);
+        System.out.println("秒杀订单："+seckillOrder);
         if (seckillOrder != null) {
             return RespBean.error(RespBeanEnum.REPEATE_ERROR);
         }
         Order order = seckillOrderService.seckill(user, goods);
-        System.out.println("订单ID：" + order.getId());
         return RespBean.success(order);
     }
 
