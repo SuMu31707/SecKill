@@ -1,5 +1,6 @@
 package com.sumu.seckill.controller;
 
+import com.sumu.seckill.annotation.AccessLimit;
 import com.sumu.seckill.pojo.SeckillMessage;
 import com.sumu.seckill.pojo.SeckillOrder;
 import com.sumu.seckill.pojo.User;
@@ -153,6 +154,7 @@ public class SecKillController implements InitializingBean {
      * @param goodsId
      * @return
      */
+    @AccessLimit(second=5,maxCount=5,needLogin=true)
     @RequestMapping("/path")
     @ResponseBody
     public RespBean getSecKillPath(User user, Long goodsId, String captcha,HttpServletRequest request) {
@@ -160,7 +162,8 @@ public class SecKillController implements InitializingBean {
             return RespBean.error(RespBeanEnum.SESSION_ERROR);
         }
         ValueOperations valueOperations = redisTemplate.opsForValue();
-        // 限制访问次数，5秒内访问5次
+        // 已经改成拦截器限流，使用自定义的AccessLimit注解
+        /*// 限制访问次数，5秒内访问5次
         String requestURI = request.getRequestURI();
         Integer count = (Integer) valueOperations.get(requestURI + ":" + user.getId());
         if (count == null) {
@@ -169,7 +172,7 @@ public class SecKillController implements InitializingBean {
             valueOperations.increment(requestURI + ":" + user.getId());
         } else {
             return RespBean.error(RespBeanEnum.ACCESS_LIMIT_REACHED);
-        }
+        }*/
 
         Boolean check = orderService.checkCaptcha(user,goodsId,captcha);
         if (!check) {
