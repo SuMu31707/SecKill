@@ -53,7 +53,7 @@ public class SecKillController implements InitializingBean {
      * Win QPS：2294.4
      * Linux QPS：
      * 接口优化后：
-     * Win QPS：2294.4
+     * Win QPS：3501.8
      * Linux QPS：
      *
      * @param user
