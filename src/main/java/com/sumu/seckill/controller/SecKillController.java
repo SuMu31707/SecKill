@@ -11,6 +11,8 @@ import com.sumu.seckill.utils.JsonUtil;
 import com.sumu.seckill.vo.GoodsVo;
 import com.sumu.seckill.vo.RespBean;
 import com.sumu.seckill.vo.RespBeanEnum;
+import com.wf.captcha.ArithmeticCaptcha;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -20,14 +22,18 @@ import org.springframework.stereotype.Controller;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Collections;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 /**
  * 商品秒杀
  */
+@Slf4j
 @Controller
 @RequestMapping("/seckill")
 public class SecKillController implements InitializingBean {
@@ -156,6 +162,27 @@ public class SecKillController implements InitializingBean {
         // 创建秒杀地址
         String path = orderService.createPath(user, goodsId);
         return RespBean.success(path);
+    }
+
+    @GetMapping("/captcha")
+    public void captcha(User user, Long goodsId, HttpServletResponse response) {
+        // 设置请求头为输出图片类型
+        response.setContentType("image/jpg");
+        response.setHeader("Pragma", "No-cache");
+        response.setHeader("Cache-Control", "no-cache");
+        response.setDateHeader("Expires", 0);
+
+        // 三个参数分别为宽、高、位数
+        // 算术类型
+        ArithmeticCaptcha captcha = new ArithmeticCaptcha(130, 32, 3);
+        redisTemplate.opsForValue().set("captcha:" + user.getId() + ":" + goodsId, captcha.text(), 300, TimeUnit.SECONDS);
+
+        // 输出图片流
+        try {
+            captcha.out(response.getOutputStream());
+        } catch (IOException e) {
+            log.error("验证码生成失败" + e.getMessage());
+        }
     }
 
     /**
