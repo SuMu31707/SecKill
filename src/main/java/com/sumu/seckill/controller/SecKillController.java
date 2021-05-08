@@ -155,10 +155,22 @@ public class SecKillController implements InitializingBean {
      */
     @RequestMapping("/path")
     @ResponseBody
-    public RespBean getSecKillPath(User user, Long goodsId, String captcha) {
+    public RespBean getSecKillPath(User user, Long goodsId, String captcha,HttpServletRequest request) {
         if (user == null) {
             return RespBean.error(RespBeanEnum.SESSION_ERROR);
         }
+        ValueOperations valueOperations = redisTemplate.opsForValue();
+        // 限制访问次数，5秒内访问5次
+        String requestURI = request.getRequestURI();
+        Integer count = (Integer) valueOperations.get(requestURI + ":" + user.getId());
+        if (count == null) {
+            valueOperations.set(requestURI + ":" + user.getId(), 1,5,TimeUnit.SECONDS);
+        } else if (count < 5) {
+            valueOperations.increment(requestURI + ":" + user.getId());
+        } else {
+            return RespBean.error(RespBeanEnum.ACCESS_LIMIT_REACHED);
+        }
+
         Boolean check = orderService.checkCaptcha(user,goodsId,captcha);
         if (!check) {
             return RespBean.error(RespBeanEnum.CAPTCHA_ERROR);
