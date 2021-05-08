@@ -15,11 +15,12 @@ import com.sumu.seckill.vo.GoodsVo;
  * @since 2021-05-06
  */
 public interface ISeckillOrderService extends IService<SeckillOrder> {
+
     /**
-     * 秒杀
+     * 查询秒杀结果
      * @param user
-     * @param goods
+     * @param goodsId
      * @return
      */
-    Order seckill(User user, GoodsVo goods);
+    Long getResult(User user, Long goodsId);
 }

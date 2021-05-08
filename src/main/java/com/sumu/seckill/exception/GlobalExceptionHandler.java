@@ -23,7 +23,7 @@ public class GlobalExceptionHandler {
             respBean.setMessage("参数校验异常："+ ex.getBindingResult().getAllErrors().get(0).getDefaultMessage());
             return respBean;
         }
-        System.out.println("发生异常："+e.getMessage());
+        System.out.println("发生异常："+e);
         return RespBean.error(RespBeanEnum.ERROR);
     }
 }

@@ -2,6 +2,8 @@ package com.sumu.seckill.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.sumu.seckill.pojo.Order;
+import com.sumu.seckill.pojo.User;
+import com.sumu.seckill.vo.GoodsVo;
 import com.sumu.seckill.vo.OrderDetailVo;
 
 /**
@@ -20,4 +22,12 @@ public interface IOrderService extends IService<Order> {
      * @return
      */
     OrderDetailVo detail(Long orderId);
+
+    /**
+     * 秒杀
+     * @param user
+     * @param goods
+     * @return
+     */
+    Order seckill(User user, GoodsVo goods);
 }
