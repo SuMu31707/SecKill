@@ -42,9 +42,9 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
     @Autowired
     private SeckillOrderMapper seckillOrderMapper;
     @Autowired
-    private ISeckillGoodsService seckillGoodsService;
-    @Autowired
     private RedisTemplate redisTemplate;
+    @Autowired
+    private ISeckillGoodsService seckillGoodsService;
     /**
      * 订单详情信息
      * @param orderId
@@ -94,13 +94,16 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         order.setGoodsPrice(seckillGoods.getSeckillPrice());
         order.setOrderChannel(1);
         order.setCreateDate(new Date());
+        // 将订单存入数据库
         orderMapper.insert(order);
         // 生成秒杀订单
         SeckillOrder seckillOrder = new SeckillOrder();
         seckillOrder.setUserId(user.getId());
         seckillOrder.setGoodsId(goods.getId());
         seckillOrder.setOrderId(order.getId());
+        // 将秒杀订单存入数据库
         seckillOrderMapper.insert(seckillOrder);
+        // 将秒杀订单存入Redis
         valueOperations.set("order:"+user.getId()+":"+goods.getId(), seckillOrder);
         return order;
     }

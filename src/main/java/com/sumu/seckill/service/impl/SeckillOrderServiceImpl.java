@@ -32,11 +32,7 @@ import java.util.Date;
 public class SeckillOrderServiceImpl extends ServiceImpl<SeckillOrderMapper, SeckillOrder> implements ISeckillOrderService {
 
     @Autowired
-    private OrderMapper orderMapper;
-    @Autowired
     private SeckillOrderMapper seckillOrderMapper;
-    @Autowired
-    private ISeckillGoodsService seckillGoodsService;
     @Autowired
     private RedisTemplate redisTemplate;
 

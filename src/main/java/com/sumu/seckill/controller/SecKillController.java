@@ -14,6 +14,7 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
+import org.springframework.data.redis.core.script.RedisScript;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -40,6 +42,8 @@ public class SecKillController implements InitializingBean {
     private RedisTemplate redisTemplate;
     @Autowired
     private MQSender mqSender;
+    @Autowired
+    private RedisScript<Long> redisScript;
 
     // 用于内存标记
     private Map<Long,Boolean> emptyStockMap = new HashMap<>();
@@ -79,8 +83,12 @@ public class SecKillController implements InitializingBean {
         if (emptyStockMap.get(goodsId)) {
             return RespBean.error(RespBeanEnum.EMPTY_STOCK);
         }
+
         // 预减库存
         Long stock = valueOperations.decrement("seckillGoods:" + goodsId);
+        // 库存预减，lua脚本执行
+//        Long stock = (Long) redisTemplate.execute(redisScript, Collections.singletonList("seckillGoods:" + goodsId), Collections.EMPTY_LIST);
+
         // 库存不足
         if (stock < 0) {
             // 将内存标记中的库存设置为空
