@@ -155,9 +155,13 @@ public class SecKillController implements InitializingBean {
      */
     @RequestMapping("/path")
     @ResponseBody
-    public RespBean getSecKillPath(User user, Long goodsId) {
+    public RespBean getSecKillPath(User user, Long goodsId, String captcha) {
         if (user == null) {
             return RespBean.error(RespBeanEnum.SESSION_ERROR);
+        }
+        Boolean check = orderService.checkCaptcha(user,goodsId,captcha);
+        if (!check) {
+            return RespBean.error(RespBeanEnum.CAPTCHA_ERROR);
         }
         // 创建秒杀地址
         String path = orderService.createPath(user, goodsId);
