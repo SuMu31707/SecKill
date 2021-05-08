@@ -5,6 +5,7 @@ import com.sumu.seckill.pojo.SeckillOrder;
 import com.sumu.seckill.pojo.User;
 import com.sumu.seckill.rabbitmq.MQSender;
 import com.sumu.seckill.service.IGoodsService;
+import com.sumu.seckill.service.IOrderService;
 import com.sumu.seckill.service.ISeckillOrderService;
 import com.sumu.seckill.utils.JsonUtil;
 import com.sumu.seckill.vo.GoodsVo;
@@ -17,10 +18,7 @@ import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.data.redis.core.script.RedisScript;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.CollectionUtils;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -39,6 +37,8 @@ public class SecKillController implements InitializingBean {
     @Autowired
     private ISeckillOrderService seckillOrderService;
     @Autowired
+    private IOrderService orderService;
+    @Autowired
     private RedisTemplate redisTemplate;
     @Autowired
     private MQSender mqSender;
@@ -46,7 +46,7 @@ public class SecKillController implements InitializingBean {
     private RedisScript<Long> redisScript;
 
     // 用于内存标记
-    private Map<Long,Boolean> emptyStockMap = new HashMap<>();
+    private Map<Long, Boolean> emptyStockMap = new HashMap<>();
 
     /**
      * 秒杀
@@ -64,13 +64,19 @@ public class SecKillController implements InitializingBean {
      * @param goodsId
      * @return
      */
-    @PostMapping("/doSeckill")
+    @PostMapping("/{path}/doSeckill")
     @ResponseBody
-    public RespBean doSeckill(User user, Long goodsId) {
+    public RespBean doSeckill(@PathVariable String path, User user, Long goodsId) {
 
         // 判断用户是否登录
         if (user == null) {
             return RespBean.error(RespBeanEnum.SESSION_ERROR);
+        }
+
+        // 校验接口地址
+        Boolean check = orderService.checkPath(user, goodsId, path);
+        if (!check) {
+            return RespBean.error(RespBeanEnum.REQUEST_ILLEGAL);
         }
 
         ValueOperations valueOperations = redisTemplate.opsForValue();
@@ -93,7 +99,7 @@ public class SecKillController implements InitializingBean {
         if (stock < 0) {
             // 将内存标记中的库存设置为空
             emptyStockMap.put(goodsId, true);
-            valueOperations.increment("seckillGoods:"+goodsId);
+            valueOperations.increment("seckillGoods:" + goodsId);
             return RespBean.error(RespBeanEnum.EMPTY_STOCK);
         }
 
@@ -117,6 +123,7 @@ public class SecKillController implements InitializingBean {
 
     /**
      * 获取秒杀结果
+     *
      * @param user
      * @param goodsId
      * @return 查询orderId：有记录返回（秒杀成功），秒杀失败：-1，排队中：0
@@ -125,12 +132,30 @@ public class SecKillController implements InitializingBean {
     @ResponseBody
     public RespBean getResult(User user, Long goodsId) {
         // 判断用户是否存在
-        if (user ==null){
+        if (user == null) {
             return RespBean.error(RespBeanEnum.SESSION_ERROR);
         }
 
         Long orderId = seckillOrderService.getResult(user, goodsId);
         return RespBean.success(orderId);
+    }
+
+    /**
+     * 获取秒杀地址
+     *
+     * @param user
+     * @param goodsId
+     * @return
+     */
+    @RequestMapping("/path")
+    @ResponseBody
+    public RespBean getSecKillPath(User user, Long goodsId) {
+        if (user == null) {
+            return RespBean.error(RespBeanEnum.SESSION_ERROR);
+        }
+        // 创建秒杀地址
+        String path = orderService.createPath(user, goodsId);
+        return RespBean.success(path);
     }
 
     /**

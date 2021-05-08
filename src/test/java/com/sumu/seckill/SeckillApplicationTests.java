@@ -72,7 +72,7 @@ class SeckillApplicationTests {
     @Test
     void testLock03() {
         ValueOperations valueOperations = redisTemplate.opsForValue();
-        UUID value = UUID.randomUUID();
+        String value = UUID.randomUUID().toString();
         Boolean isLock = valueOperations.setIfAbsent("k1", value, 120, TimeUnit.SECONDS);
         if (isLock) {
             valueOperations.set("name", "sumu");
