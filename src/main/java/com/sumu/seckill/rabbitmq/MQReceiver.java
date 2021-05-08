@@ -25,4 +25,29 @@ public class MQReceiver {
     public void receiver02(Object msg) {
         log.info("接收Queue02消息：" + msg);
     }
+
+    @RabbitListener(queues = "queue_direct01")
+    public void receiver03(Object msg) {
+        log.info("接收direct01消息：" + msg);
+    }
+
+    @RabbitListener(queues = "queue_direct02")
+    public void receiver04(Object msg) {
+        log.info("接收direct02消息：" + msg);
+    }
+
+    @RabbitListener(queues = "queue_direct03")
+    public void receiver05(Object msg) {
+        log.info("接收direct03消息：" + msg);
+    }
+
+    @RabbitListener(queues = "queue_topic01")
+    public void receiver06(Object msg) {
+        log.info("接收topic01消息：" + msg);
+    }
+
+    @RabbitListener(queues = "queue_topic02")
+    public void receiver07(Object msg) {
+        log.info("接收topic02消息：" + msg);
+    }
 }
