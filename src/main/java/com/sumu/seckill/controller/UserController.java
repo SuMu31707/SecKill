@@ -80,4 +80,17 @@ public class UserController {
     public void topic02() {
         mqSender.send04("hello hello.queue.su.mu");
     }
+
+    /**
+     * headers模式
+     */
+    @RequestMapping("/mq/headers01")
+    public void headers01() {
+        mqSender.send05("hello whereAny");
+    }
+
+    @RequestMapping("/mq/headers02")
+    public void headers02() {
+        mqSender.send06("hello whereAll");
+    }
 }
